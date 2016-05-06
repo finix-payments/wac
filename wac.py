@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.23'
+__version__ = '0.23.1-beta'
 
 __all__ = [
     'Config',
