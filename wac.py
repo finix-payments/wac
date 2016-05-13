@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.23.1b0'
+__version__ = '0.23.1b1'
 
 __all__ = [
     'Config',
@@ -785,7 +785,7 @@ class PaginationMixin(object):
             items = self.pagination.current.items
             total = self.pagination.current.total
         else:
-            items = self.pagination._page(0, 2).results
+            items = self.pagination._page(0, 2).items
             total = len(items)
         if total > 1:
             raise MultipleResultsFound()
@@ -795,15 +795,15 @@ class PaginationMixin(object):
 
     def first(self):
         if self.pagination.fetched and self.pagination.current.offset == 0:
-            items = self.pagination.current.results
+            items = self.pagination.current.items
         else:
-            items = self.pagination._page(0, 1).results
+            items = self.pagination._page(0, 1).items
         return items[0] if items else None
 
     def __iter__(self):
         self.pagination.first()
         for page in self.pagination:
-            for v in page.results:
+            for v in page.items:
                 yield v
 
     def __len__(self):
