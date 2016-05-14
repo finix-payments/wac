@@ -446,9 +446,11 @@ class Client(threading.local, object):
         return self._op(self.interface.get, uri, **kwargs)
 
     def post(self, uri, data=None, **kwargs):
-        mime_type, data = self._serialize(data)
         kwargs.setdefault('headers', {})
-        kwargs['headers']['Content-Type'] = mime_type
+        if data is not None:
+            mime_type, data = self._serialize(data)
+            kwargs['headers']['Content-Type'] = mime_type
+        # kwargs['headers']['Content-Type'] = "multipart/form-data" if "files" in kwargs else mime_type
         return self._op(self.interface.post, uri, data=data, **kwargs)
 
     def put(self, uri, data=None, **kwargs):
@@ -486,8 +488,8 @@ class Client(threading.local, object):
             ex = self.config.error_cls(ex)
             raise ex
 
-        kwargs.setdefault('headers', {})
-        kwargs['headers'].update(self.config.headers)
+        kwargs.setdefault('headers', self.config.headers)
+        # kwargs['headers'].update(self.config.headers)
         kwargs.setdefault('allow_redirects', self.config.allow_redirects)
         if self.config.auth:
             kwargs['auth'] = self.config.auth
@@ -1098,11 +1100,15 @@ class ResourceCollection(PaginationMixin):
         self.resource_cls = resource_cls
         self.pagination = Pagination(resource_cls, uri, current=page)
 
-    def create(self, data):
-        resp = self.resource_cls.client.post(self.uri, data=data)
+    # def create(self, data):
+    #     resp = self.resource_cls.client.post(self.uri, data=data)
+    #     instance = self.resource_cls(**resp.data)
+    #     return instance
+
+    def create(self, data=None, **kwargs):
+        resp = self.resource_cls.client.post(self.uri, data=data, **kwargs)
         instance = self.resource_cls(**resp.data)
         return instance
-        # return self.resource_cls._load(self.resource_cls, resp.data)
 
     def filter(self, *args, **kwargs):
         q = self.resource_cls.query_cls(
