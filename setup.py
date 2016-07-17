@@ -15,10 +15,10 @@ setup(
              .compile(r".*__version__ = '(.*?)'", re.S)
              .match(open('wac.py').read())
              .group(1)),
-    url='https://github.com/balanced/wac/',
+    url='https://github.com/finix-payments/wac',
     license=open('LICENSE').read(),
-    author='Balanced',
-    author_email='dev+wac@balancedpayments.com',
+    author='Finix',
+    author_email='dev@finixpayments.com',
     description='Writing RESTful API clients.',
     long_description=(
         open('README.rst').read() + '\n\n' +
