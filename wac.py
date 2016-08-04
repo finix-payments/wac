@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.24'
+__version__ = '0.25'
 
 __all__ = [
     'Config',
@@ -496,6 +496,7 @@ class Client(threading.local, object):
         if self.config.timeout is not None:
             kwargs['timeout'] = self.config.timeout
 
+        uri = "/" + "/".join(filter(None, uri.split("/")))
         if uri.startswith(self.config.root_url):
             url = uri
         else:
