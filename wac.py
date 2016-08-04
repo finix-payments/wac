@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.25'
+__version__ = '0.26'
 
 __all__ = [
     'Config',
@@ -591,6 +591,9 @@ class Page(_ObjectifyMixin):
     def __init__(self, resource_cls, **data):
         self.resource_cls = resource_cls
         self._objectify(resource_cls, **data)
+        docs = getattr(self, self.resource_cls.type) if hasattr(self, self.resource_cls.type) else []
+        items = [self.resource_cls(hal_codec=rdoc) for rdoc in docs]
+        setattr(self, "items", items)
 
     @property
     def index(self):
@@ -718,7 +721,7 @@ class Pagination(object):
         page = self.current
         while True:
             yield page
-            page = page.next
+            page = page.next if hasattr(page, "next") else None
             if not page:
                 break
             if isinstance(page, basestring):
