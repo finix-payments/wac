@@ -32,6 +32,13 @@ logger = logging.getLogger(__name__)
 
 
 # utilities
+def refine_url(href):
+    parse = urlparse.urlparse(href)
+    uri = "/" + "/".join(filter(None, parse.path.split("/")))
+    if parse.scheme is str():
+        return uri
+    return parse.scheme + "://" + parse.netloc + uri
+
 
 # http://stackoverflow.com/a/5191224/1339571
 class _ClassPropertyDescriptor(object):
@@ -454,7 +461,7 @@ class Client(threading.local, object):
         return self._op(self.interface.post, uri, data=data, **kwargs)
 
     def put(self, uri, data=None, **kwargs):
-        mime_type, data = self._serialize(data)
+        mime_type, data = self._serialize(data)  # TODO failed here
         kwargs.setdefault('headers', {})
         kwargs['headers']['Content-Type'] = mime_type
         return self._op(self.interface.put, uri, data=data, **kwargs)
@@ -496,11 +503,13 @@ class Client(threading.local, object):
         if self.config.timeout is not None:
             kwargs['timeout'] = self.config.timeout
 
-        uri = "/" + "/".join(filter(None, uri.split("/")))
+        # uri = refine_uri(uri)
         if uri.startswith(self.config.root_url):
             url = uri
         else:
             url = self.config.root_url + uri
+
+        url = refine_url(url)
 
         method = f.__name__.upper()
         for handler in self.config.before_request:
@@ -1120,6 +1129,9 @@ class ResourceCollection(PaginationMixin):
         q.filter(*args, **kwargs)
         return q
 
+    def get(self):
+        return self.filter()
+
     def sort(self, *args):
         q = self.resource_cls.query_cls(
             self.resource_cls, self.uri, self.pagination.size)
@@ -1374,9 +1386,14 @@ class Resource(_ObjectifyMixin):
         return Query(cls, cls.uri_gen.root_uri, page_size=cls.page_size)
 
     @classmethod
-    def get(cls, uri):
-        resp = cls.client.get(uri)
-        return cls(**resp.data)
+    def get(cls, **kwargs):
+        if "uri" in kwargs:
+            resp = cls.client.get(kwargs.get("uri"))
+            return cls(**resp.data)
+        elif "id" in kwargs:
+            uri = refine_url(cls.type + "/" + kwargs.get("id"))
+            return cls.get(uri=uri)
+        return cls.query
 
     def refresh(self):
         resp = self.client.get(self.uri)
