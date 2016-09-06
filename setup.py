@@ -29,14 +29,14 @@ setup(
     include_package_data=True,
     tests_require=[
         'mock>=0.8',
-        'simplejson >= 2.1',
         'unittest2 >= 0.5.1',
-        'iso8601',
     ],
     install_requires=[
         'certifi==0.0.8',  # force requests optional
         'chardet >= 1.0',  # force requests optional
-        'requests>=1.2.3',
+        'simplejson >= 2.1',
+        'iso8601',
+        'requests>=1.2.3'
     ],
     test_suite='tests',
     classifiers=[
