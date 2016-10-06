@@ -600,7 +600,7 @@ class Page(_ObjectifyMixin):
     def __init__(self, resource_cls, **data):
         self.resource_cls = resource_cls
         self._objectify(resource_cls, **data)
-        docs = getattr(self, self.resource_cls.type) if hasattr(self, self.resource_cls.type) else []
+        docs = getattr(self, self.resource_cls.type) if self.resource_cls.type is not None and hasattr(self, self.resource_cls.type) else []
         items = [self.resource_cls(hal_codec=rdoc) for rdoc in docs]
         setattr(self, "items", items)
 
@@ -787,10 +787,10 @@ class PaginationMixin(object):
 
     def count(self):
         if self.pagination.fetched:
-            total = self.pagination.current.total
+            page = self.pagination.current.page
         else:
-            total = self.pagination._page(0, 1).total
-        return total
+            page = self.pagination._page(0, 1).page
+        return page.total if hasattr(page, "total") else page["count"]
 
     def all(self):
         return list(self)
@@ -818,8 +818,12 @@ class PaginationMixin(object):
     def __iter__(self):
         self.pagination.first()
         for page in self.pagination:
-            for v in page.items:
-                yield v
+            if hasattr(page, "items"):
+                for v in page.items:
+                    yield v
+            else:
+                logging.info("No more items found")
+                break
 
     def __len__(self):
         return self.count()
