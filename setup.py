@@ -10,7 +10,7 @@ else:
 
 
 setup(
-    name='wac',
+    name='finix-wac',
     version=(re
              .compile(r".*__version__ = '(.*?)'", re.S)
              .match(open('wac.py').read())

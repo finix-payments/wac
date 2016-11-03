@@ -2,9 +2,6 @@
 wac
 ===
 
-.. image:: https://secure.travis-ci.org/balanced/wac.png?branch=master
-    :target: http://travis-ci.org/balanced/wac
-
 To write a friendly client for a RESTful API you typically end up doing the
 following:
 
@@ -31,11 +28,11 @@ Installation
 
 Simply::
 
-    $ pip install wac
+    $ pip install finix-wac
 
 or if you prefer::
 
-    $ easy_install wac
+    $ easy_install finix-wac
 
 Requirements
 ------------
