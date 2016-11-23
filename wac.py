@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.29'
+__version__ = '0.30'
 
 __all__ = [
     'Config',
@@ -37,7 +37,7 @@ def refine_url(href):
     uri = "/" + "/".join(filter(None, parse.path.split("/")))
     if parse.scheme is str():
         return uri
-    return parse.scheme + "://" + parse.netloc + uri
+    return parse.scheme + "://" + parse.netloc + uri + ("?" + parse.query if parse.query is not None else "")
 
 
 # http://stackoverflow.com/a/5191224/1339571
@@ -1406,7 +1406,7 @@ class Resource(_ObjectifyMixin):
         self.__dict__.update(instance.__dict__)
         return self
 
-    def save(self):
+    def save(self, **kwargs):
         cls = type(self)
         attrs = self.__dict__.copy()
         uri = attrs.pop('uri', None)
