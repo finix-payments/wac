@@ -14,7 +14,7 @@ import urlparse
 
 import requests
 
-__version__ = '0.30'
+__version__ = '0.31'
 
 __all__ = [
     'Config',
@@ -1124,7 +1124,11 @@ class ResourceCollection(PaginationMixin):
 
     def create(self, data=None, **kwargs):
         resp = self.resource_cls.client.post(self.uri, data=data, **kwargs)
-        instance = self.resource_cls(**resp.data)
+        resource_cls = self.resource_cls
+        instance_cls = getattr(resource_cls, "instance_cls", None)
+        if callable(instance_cls):
+            resource_cls = instance_cls(**resp.data)
+        instance = resource_cls(**resp.data)
         return instance
 
     def filter(self, *args, **kwargs):
